@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://user:password@db:5432/dsh
+      - SHAPE_SERVICE_URL=http://shape-service:8000
+      - PORT=3001
+    depends_on:
+      - db
+      - shape-service
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - backend_uploads:/app/uploads
+      - backend_models:/app/models
+      - backend_previews:/app/previews
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+      - /app/public
+
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=dsh
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  shape-service:
+    build:
+      context: ./shap-e-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./shap-e-service/app:/app
+      - shape_models:/app/models
+      - shape_previews:/app/previews
+      - backend_uploads:/app/uploads:ro
+
+volumes:
+  postgres_data:
+  backend_uploads:
+  backend_models:
+  backend_previews:
+  shape_models:
+  shape_previews:
