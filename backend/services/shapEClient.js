@@ -16,7 +16,16 @@ class ShapEClient {
       
       // Add image if provided
       if (imagePath) {
-        const imageFullPath = path.join(__dirname, '../uploads', path.basename(imagePath));
+        // Обрабатываем как относительный путь (/uploads/filename) или полный путь
+        let imageFullPath;
+        if (imagePath.startsWith('/uploads/')) {
+          imageFullPath = path.join(__dirname, '..', imagePath);
+        } else if (path.isAbsolute(imagePath)) {
+          imageFullPath = imagePath;
+        } else {
+          imageFullPath = path.join(__dirname, '../uploads', path.basename(imagePath));
+        }
+        
         if (!fs.existsSync(imageFullPath)) {
           throw new Error(`Image file not found: ${imageFullPath}`);
         }
@@ -39,9 +48,21 @@ class ShapEClient {
         timeout: 300000 // 5 minutes timeout
       });
       
+      // Преобразуем пути из контейнера в относительные пути для backend
+      let modelPath = response.data.model_path;
+      let previewPath = response.data.preview_path || null;
+      
+      // Если пути из контейнера SHAP-E, преобразуем их
+      if (modelPath && modelPath.startsWith('/app/')) {
+        modelPath = modelPath.replace('/app/models', '/models');
+      }
+      if (previewPath && previewPath.startsWith('/app/')) {
+        previewPath = previewPath.replace('/app/previews', '/previews');
+      }
+      
       return {
-        modelPath: response.data.model_path,
-        previewPath: response.data.preview_path || null,
+        modelPath: modelPath,
+        previewPath: previewPath,
         status: response.data.status
       };
     } catch (error) {

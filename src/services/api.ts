@@ -1,137 +1,214 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:3001') + '/api';
 
-export interface Project {
+// Типы для API
+export interface User {
   id: number;
-  name: string;
-  description?: string;
-  status: 'pending' | 'generating' | 'completed' | 'failed';
-  image_path?: string;
-  model_path?: string;
-  preview_path?: string;
-  prompt?: string;
-  generation_type?: 'image' | 'text' | 'both';
+  email: string;
+  name?: string;
   created_at: string;
-  updated_at: string;
 }
 
-export interface UploadResponse {
+export interface AuthResponse {
   message: string;
-  filename: string;
-  path: string;
-  size: number;
+  user: User;
 }
 
-export interface GenerateResponse {
-  message: string;
-  projectId: number;
-  modelPath: string;
-  previewPath?: string;
+export interface LoginRequest {
+  email: string;
+  password: string;
 }
 
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  name?: string;
+}
+
+// Класс для работы с API
 class ApiService {
   private baseURL: string;
 
-  constructor() {
-    this.baseURL = API_URL;
+  constructor(baseURL: string = API_BASE_URL) {
+    this.baseURL = baseURL;
   }
 
+  // Универсальный метод для запросов
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    const response = await fetch(url, {
-      ...options,
+    
+    const defaultOptions: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
-    });
+      credentials: 'include', // Важно для cookies
+      ...options,
+    };
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || `HTTP error! status: ${response.status}`);
+    try {
+      const response = await fetch(url, defaultOptions);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || errorData.message || `HTTP error! status: ${response.status}`;
+        throw new Error(errorMessage);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API request failed:', error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Network error or unknown error occurred');
     }
-
-    return response.json();
   }
 
-  // Projects
-  async getProjects(): Promise<Project[]> {
-    return this.request<Project[]>('/api/projects');
-  }
-
-  async getProject(id: number): Promise<Project> {
-    return this.request<Project>(`/api/projects/${id}`);
-  }
-
-  async createProject(
-    name: string,
-    description?: string,
-    prompt?: string,
-    generationType?: 'image' | 'text' | 'both'
-  ): Promise<Project> {
-    return this.request<Project>('/api/projects', {
+  // Авторизация
+  async register(data: RegisterRequest): Promise<AuthResponse> {
+    return this.request<AuthResponse>('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, description, prompt, generationType }),
+      body: JSON.stringify(data),
     });
   }
 
-  async updateProject(
-    id: number,
-    data: Partial<Project>
-  ): Promise<Project> {
-    return this.request<Project>(`/api/projects/${id}`, {
+  async login(data: LoginRequest): Promise<AuthResponse> {
+    return this.request<AuthResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async logout(): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/auth/logout', {
+      method: 'POST',
+    });
+  }
+
+  async getCurrentUser(): Promise<{ user: User }> {
+    return this.request<{ user: User }>('/auth/me');
+  }
+
+  // Проекты
+  async getProjects(): Promise<{ projects: any[] }> {
+    return this.request<{ projects: any[] }>('/projects');
+  }
+
+  // Получить проект по ID
+  async getProject(id: number): Promise<{ project: any }> {
+    return this.request<{ project: any }>(`/projects/${id}`);
+  }
+
+  // Получить все публичные проекты (для главной страницы)
+  async getAllProjects(params?: { q?: string; sort?: 'created_at' | 'updated_at' | 'name' | 'author'; order?: 'asc' | 'desc' }): Promise<{ projects: any[] }> {
+    const queryParams = new URLSearchParams();
+    if (params?.q) queryParams.set('q', params.q);
+    if (params?.sort) queryParams.set('sort', params.sort);
+    if (params?.order) queryParams.set('order', params.order);
+    const qs = queryParams.toString();
+    const endpoint = `/projects/public${qs ? `?${qs}` : ''}`;
+    return this.request<{ projects: any[] }>(endpoint);
+  }
+
+  async createProject(data: { name: string; description?: string; is_public?: boolean; text_input?: string }): Promise<any> {
+    return this.request<any>('/projects', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateProject(id: number, data: { name?: string; description?: string; is_public?: boolean; status?: string }): Promise<any> {
+    return this.request<any>(`/projects/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 
-  async deleteProject(id: number): Promise<void> {
-    return this.request<void>(`/api/projects/${id}`, {
+  async deleteProject(id: number): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/projects/${id}`, {
       method: 'DELETE',
     });
   }
 
-  // Upload
-  async uploadImage(file: File): Promise<UploadResponse> {
+  // Загрузка файлов
+  async uploadProjectImages(projectId: number, files: File[]): Promise<any> {
     const formData = new FormData();
-    formData.append('image', file);
-
-    const response = await fetch(`${this.baseURL}/api/upload`, {
+    files.forEach((file) => formData.append('images', file));
+    return this.request<any>(`/upload/project/${projectId}`, {
       method: 'POST',
+      headers: {},
       body: formData,
     });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || `HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
   }
 
-  // Generate
-  async generateModel(
-    projectId: number,
-    imagePath?: string,
-    prompt?: string,
-    generationType?: 'image' | 'text' | 'both'
-  ): Promise<GenerateResponse> {
-    return this.request<GenerateResponse>('/api/generate', {
+  async uploadAvatar(file: File): Promise<{ message: string; avatarPath: string }> {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.request<{ message: string; avatarPath: string }>(`/upload/avatar`, {
       method: 'POST',
-      body: JSON.stringify({ projectId, imagePath, prompt, generationType }),
+      headers: {},
+      body: formData,
     });
   }
 
-  async getGenerationStatus(projectId: number): Promise<{
-    projectId: number;
-    status: string;
-    modelPath?: string;
-    previewPath?: string;
-  }> {
-    return this.request(`/api/generate/status/${projectId}`);
+  async generatePreview(file: File): Promise<{ message: string; previewUrl: string }> {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.request<{ message: string; previewUrl: string }>(`/upload/preview`, {
+      method: 'POST',
+      headers: {},
+      body: formData,
+    });
+  }
+
+  async generateTextPreview(text: string): Promise<{ message: string; previewUrl: string }> {
+    return this.request<{ message: string; previewUrl: string }>('/upload/text-preview', {
+      method: 'POST',
+      body: JSON.stringify({ text }),
+    });
+  }
+
+  // Generate 3D model
+  async generateModel(projectId: number, data: { imagePath?: string; prompt?: string; generationType?: string }): Promise<any> {
+    return this.request<any>('/generate', {
+      method: 'POST',
+      body: JSON.stringify({
+        projectId,
+        ...data
+      }),
+    });
+  }
+
+  // Get generation status
+  async getGenerationStatus(projectId: number): Promise<{ projectId: number; status: string; modelPath?: string; previewPath?: string }> {
+    return this.request<{ projectId: number; status: string; modelPath?: string; previewPath?: string }>(`/generate/status/${projectId}`);
+  }
+
+  // Health check
+  async healthCheck(): Promise<{ status: string; timestamp: string; version: string }> {
+    return this.request<{ status: string; timestamp: string; version: string }>('/health');
+  }
+
+  // Профиль
+  async updateProfile(data: { name?: string | null }): Promise<{ message: string; user: User }> {
+    return this.request<{ message: string; user: User }>('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Построение абсолютной ссылки для файлов из /uploads
+  getFileUrl(path: string | null | undefined): string {
+    if (!path) return '';
+    const base = this.baseURL.replace(/\/api$/, '');
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    return `${base}${normalized}`;
   }
 }
 
-export default new ApiService();
+// Экспортируем единственный экземпляр
+export const apiService = new ApiService();
+export default apiService;

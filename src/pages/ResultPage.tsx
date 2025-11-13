@@ -1,138 +1,210 @@
-"resolved": "https://registry.npmjs.org/arg/-/arg-5.0.2.tgz",
-      "integrity": "sha512-PYjyFOLKQ9y57JvQ6QLo8dAgNqswh8M1RMJYdQduT6xbWSgK36P/Z/v+p888pM69jMMfS8Xd8F6I1kQ/I9HUGg==",
-      "license": "MIT"
-    },
-    "node_modules/argparse": {
-      "version": "1.0.10",
-      "resolved": "https://registry.npmjs.org/argparse/-/argparse-1.0.10.tgz",
-      "integrity": "sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==",
-      "license": "MIT",
-      "dependencies": {
-        "sprintf-js": "~1.0.2"
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import Header from '../components/Header';
+import api from '../services/api';
+
+interface LocationState {
+  projectId?: number;
+}
+
+const ResultPage: React.FC = () => {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [project, setProject] = useState<any | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = (location.state || {}) as LocationState;
+
+  useEffect(() => {
+    const loadProject = async () => {
+      if (!state.projectId) {
+        setIsLoading(false);
+        return;
       }
-    },
-    "node_modules/aria-query": {
-      "version": "5.3.2",
-      "resolved": "https://registry.npmjs.org/aria-query/-/aria-query-5.3.2.tgz",
-      "integrity": "sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw==",
-      "license": "Apache-2.0",
-      "engines": {
-        "node": ">= 0.4"
+
+      try {
+        // Проверяем статус генерации
+        const status = await api.getGenerationStatus(state.projectId);
+        
+        // Загружаем проект
+        const projectData = await api.getProject(state.projectId);
+        setProject(projectData.project);
+        
+        // Если генерация еще идет, проверяем периодически
+        if (status.status === 'generating') {
+          const interval = setInterval(async () => {
+            try {
+              const newStatus = await api.getGenerationStatus(state.projectId!);
+              if (newStatus.status !== 'generating') {
+                clearInterval(interval);
+                const updatedProject = await api.getProject(state.projectId!);
+                setProject(updatedProject.project);
+              }
+            } catch (e) {
+              console.error('Error checking status:', e);
+            }
+          }, 3000); // Проверяем каждые 3 секунды
+
+          return () => clearInterval(interval);
+        }
+      } catch (e) {
+        console.error('Error loading project:', e);
+      } finally {
+        setIsLoading(false);
       }
-    },
-    "node_modules/array-buffer-byte-length": {
-      "version": "1.0.2",
-      "resolved": "https://registry.npmjs.org/array-buffer-byte-length/-/array-buffer-byte-length-1.0.2.tgz",
-      "integrity": "sha512-LHE+8BuR7RYGDKvnrmcuSq3tDcKv9OFEXQt/HpbZhY7V6h0zlUXutnAD82GiFx9rdieCMjkvtcsPqBwgUl1Iiw==",
-      "license": "MIT",
-      "dependencies": {
-        "call-bound": "^1.0.3",
-        "is-array-buffer": "^3.0.5"
-      },
-      "engines": {
-        "node": ">= 0.4"
-      },
-      "funding": {
-        "url": "https://github.com/sponsors/ljharb"
-      }
-    },
-    "node_modules/array-flatten": {
-      "version": "1.1.1",
-      "resolved": "https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz",
-      "integrity": "sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==",
-      "license": "MIT"
-    },
-    "node_modules/array-includes": {
-      "version": "3.1.9",
-      "resolved": "https://registry.npmjs.org/array-includes/-/array-includes-3.1.9.tgz",
-      "integrity": "sha512-FmeCCAenzH0KH381SPT5FZmiA/TmpndpcaShhfgEN9eCVjnFBqq3l1xrI42y8+PPLI6hypzou4GXw00WHmPBLQ==",
-      "license": "MIT",
-      "dependencies": {
-        "call-bind": "^1.0.8",
-        "call-bound": "^1.0.4",
-        "define-properties": "^1.2.1",
-        "es-abstract": "^1.24.0",
-        "es-object-atoms": "^1.1.1",
-        "get-intrinsic": "^1.3.0",
-        "is-string": "^1.1.1",
-        "math-intrinsics": "^1.1.0"
-      },
-      "engines": {
-        "node": ">= 0.4"
-      },
-      "funding": {
-        "url": "https://github.com/sponsors/ljharb"
-      }
-    },
-    "node_modules/array-union": {
-      "version": "2.1.0",
-      "resolved": "https://registry.npmjs.org/array-union/-/array-union-2.1.0.tgz",
-      "integrity": "sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==",
-      "license": "MIT",
-      "engines": {
-        "node": ">=8"
-      }
-    },
-    "node_modules/array.prototype.findlast": {
-      "version": "1.2.5",
-      "resolved": "https://registry.npmjs.org/array.prototype.findlast/-/array.prototype.findlast-1.2.5.tgz",
-      "integrity": "sha512-CVvd6FHg1Z3POpBLxO6E6zr+rSKEQ9L6rZHAaY7lLfhKsWYUBBOuMs0e9o24oopj6H+geRCX0YJ+TJLBK2eHyQ==",
-      "license": "MIT",
-      "dependencies": {
-        "call-bind": "^1.0.7",
-        "define-properties": "^1.2.1",
-        "es-abstract": "^1.23.2",
-        "es-errors": "^1.3.0",
-        "es-object-atoms": "^1.0.0",
-        "es-shim-unscopables": "^1.0.2"
-      },
-      "engines": {
-        "node": ">= 0.4"
-      },
-      "funding": {
-        "url": "https://github.com/sponsors/ljharb"
-      }
-    },
-    "node_modules/array.prototype.findlastindex": {
-      "version": "1.2.6",
-      "resolved": "https://registry.npmjs.org/array.prototype.findlastindex/-/array.prototype.findlastindex-1.2.6.tgz",
-      "integrity": "sha512-F/TKATkzseUExPlfvmwQKGITM3DGTK+vkAsCZoDc5daVygbJBnjEUCbgkAvVFsgfXfX4YIqZ/27G3k3tdXrTxQ==",
-      "license": "MIT",
-      "dependencies": {
-        "call-bind": "^1.0.8",
-        "call-bound": "^1.0.4",
-        "define-properties": "^1.2.1",
-        "es-abstract": "^1.23.9",
-        "es-errors": "^1.3.0",
-        "es-object-atoms": "^1.1.1",
-        "es-shim-unscopables": "^1.1.0"
-      },
-      "engines": {
-        "node": ">= 0.4"
-      },
-      "funding": {
-        "url": "https://github.com/sponsors/ljharb"
-      }
-    },
-    "node_modules/array.prototype.flat": {
-      "version": "1.3.3",
-      "resolved": "https://registry.npmjs.org/array.prototype.flat/-/array.prototype.flat-1.3.3.tgz",
-      "integrity": "sha512-rwG/ja1neyLqCuGZ5YYrznA62D4mZXg0i1cIskIUKSiqF3Cje9/wXAls9B9s1Wa2fomMsIv8czB8jZcPmxCXFg==",
-      "license": "MIT",
-      "dependencies": {
-        "call-bind": "^1.0.8",
-        "define-properties": "^1.2.1",
-        "es-abstract": "^1.23.5",
-        "es-shim-unscopables": "^1.0.2"
-      },
-      "engines": {
-        "node": ">= 0.4"
-      },
-      "funding": {
-        "url": "https://github.com/sponsors/ljharb"
-      }
-    },
-    "node_modules/array.prototype.flatmap": {
-      "version": "1.3.3",
-      "resolved": "https://registry.npmjs.org/array.prototype.flatmap/-/array.prototype.flatmap-1.3.3.tgz",
-      
+    };
+
+    loadProject();
+  }, [state.projectId]);
+
+  const handleBack = () => {
+    navigate('/dashboard');
+  };
+
+  const handleDownload = async () => {
+    if (!project?.model_path) {
+      alert('Модель еще не готова');
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      const modelUrl = api.getFileUrl(project.model_path);
+      const link = document.createElement('a');
+      link.href = modelUrl;
+      link.download = project.name ? `${project.name}.ply` : '3d-model.ply';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {
+      alert('Ошибка скачивания файла');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+
+  const modelUrl = project?.model_path ? api.getFileUrl(project.model_path) : null;
+  const previewUrl = project?.preview_path ? api.getFileUrl(project.preview_path) : null;
+  const isGenerating = project?.status === 'generating';
+
+  return (
+    <div className="page">
+      <Header />
+
+      <div className="page-content">
+        <div className="container">
+          <button 
+            className="btn btn-outline" 
+            onClick={handleBack}
+            style={{ marginBottom: '24px' }}
+          >
+            Назад
+          </button>
+          
+          {isLoading ? (
+            <div className="empty-state">
+              <h2>Загрузка...</h2>
+            </div>
+          ) : isGenerating ? (
+            <div className="empty-state">
+              <div style={{ 
+                display: 'inline-block',
+                width: '40px',
+                height: '40px',
+                border: '4px solid #f3f3f3',
+                borderTop: '4px solid #007bff',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                marginBottom: '16px'
+              }}></div>
+              <h2>Генерация 3D модели...</h2>
+              <p>Это может занять несколько минут</p>
+            </div>
+          ) : (
+            <div className="success-message">
+              <h2>Готово! 3D модель создана</h2>
+              
+              {previewUrl && (
+                <div style={{ marginTop: '24px', marginBottom: '24px' }}>
+                  <img 
+                    src={previewUrl} 
+                    alt="3D Model Preview" 
+                    style={{ 
+                      maxWidth: '100%', 
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                    }} 
+                  />
+                </div>
+              )}
+              
+              <div style={{ marginTop: '32px' }}>
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleDownload}
+                  disabled={isDownloading || !modelUrl}
+                  style={{ minWidth: '200px', marginRight: '12px' }}
+                >
+                  {isDownloading ? (
+                    <>
+                      <span style={{ 
+                        display: 'inline-block',
+                        width: '16px',
+                        height: '16px',
+                        border: '2px solid #f3f3f3',
+                        borderTop: '2px solid #6c757d',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        marginRight: '8px'
+                      }}></span>
+                      Скачивание...
+                    </>
+                  ) : (
+                    'Скачать 3D модель'
+                  )}
+                </button>
+                {state.projectId && (
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => navigate(`/project/${state.projectId}`)}
+                    style={{ minWidth: '200px' }}
+                  >
+                    Перейти к проекту
+                  </button>
+                )}
+              </div>
+
+              {!modelUrl && (
+                <div style={{ marginTop: '16px', color: '#666', fontSize: '14px' }}>
+                  Модель еще обрабатывается. Обновите страницу через несколько секунд.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-10px);
+          }
+          60% {
+            transform: translateY(-5px);
+          }
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default ResultPage;

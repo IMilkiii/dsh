@@ -1,177 +1,126 @@
-: "*",
-        "@types/send": "*"
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import api from '../services/api';
+
+interface LocationState {
+  previewUrl: string;
+  projectName: string;
+  is_public?: boolean;
+  creationMode?: 'images' | 'text';
+  images: File[];
+  textInput?: string;
+}
+
+const PreviewPage: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = (location.state || {}) as LocationState;
+
+  const [previewUrl, setPreviewUrl] = useState<string>(state.previewUrl);
+  const [isBusy, setIsBusy] = useState<boolean>(false);
+
+  const handleDislike = async () => {
+    setIsBusy(true);
+    try {
+      let res;
+      if (state.creationMode === 'text' && state.textInput) {
+        // Повторная генерация предпросмотра из текста
+        res = await api.generateTextPreview(state.textInput);
+      } else if (state.images && state.images.length > 0) {
+        // Повторная генерация предпросмотра по первой картинке
+        res = await api.generatePreview(state.images[0]);
+      } else {
+        throw new Error('Нет данных для генерации');
       }
-    },
-    "node_modules/@types/sockjs": {
-      "version": "0.3.36",
-      "resolved": "https://registry.npmjs.org/@types/sockjs/-/sockjs-0.3.36.tgz",
-      "integrity": "sha512-MK9V6NzAS1+Ud7JV9lJLFqW85VbC9dq3LmwZCuBe4wBDgKC0Kj/jd8Xl+nSviU+Qc3+m7umHHyHg//2KSa0a0Q==",
-      "license": "MIT",
-      "dependencies": {
-        "@types/node": "*"
-      }
-    },
-    "node_modules/@types/stack-utils": {
-      "version": "2.0.3",
-      "resolved": "https://registry.npmjs.org/@types/stack-utils/-/stack-utils-2.0.3.tgz",
-      "integrity": "sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==",
-      "license": "MIT"
-    },
-    "node_modules/@types/trusted-types": {
-      "version": "2.0.7",
-      "resolved": "https://registry.npmjs.org/@types/trusted-types/-/trusted-types-2.0.7.tgz",
-      "integrity": "sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==",
-      "license": "MIT"
-    },
-    "node_modules/@types/ws": {
-      "version": "8.18.1",
-      "resolved": "https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz",
-      "integrity": "sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==",
-      "license": "MIT",
-      "dependencies": {
-        "@types/node": "*"
-      }
-    },
-    "node_modules/@types/yargs": {
-      "version": "16.0.9",
-      "resolved": "https://registry.npmjs.org/@types/yargs/-/yargs-16.0.9.tgz",
-      "integrity": "sha512-tHhzvkFXZQeTECenFoRljLBYPZJ7jAVxqqtEI0qTLOmuultnFp4I9yKE17vTuhf7BkhCu7I4XuemPgikDVuYqA==",
-      "license": "MIT",
-      "dependencies": {
-        "@types/yargs-parser": "*"
-      }
-    },
-    "node_modules/@types/yargs-parser": {
-      "version": "21.0.3",
-      "resolved": "https://registry.npmjs.org/@types/yargs-parser/-/yargs-parser-21.0.3.tgz",
-      "integrity": "sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==",
-      "license": "MIT"
-    },
-    "node_modules/@typescript-eslint/eslint-plugin": {
-      "version": "5.62.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-5.62.0.tgz",
-      "integrity": "sha512-TiZzBSJja/LbhNPvk6yc0JrX9XqhQ0hdh6M2svYfsHGejaKFIAGd9MQ+ERIMzLGlN/kZoYIgdxFV0PuljTKXag==",
-      "license": "MIT",
-      "dependencies": {
-        "@eslint-community/regexpp": "^4.4.0",
-        "@typescript-eslint/scope-manager": "5.62.0",
-        "@typescript-eslint/type-utils": "5.62.0",
-        "@typescript-eslint/utils": "5.62.0",
-        "debug": "^4.3.4",
-        "graphemer": "^1.4.0",
-        "ignore": "^5.2.0",
-        "natural-compare-lite": "^1.4.0",
-        "semver": "^7.3.7",
-        "tsutils": "^3.21.0"
-      },
-      "engines": {
-        "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/typescript-eslint"
-      },
-      "peerDependencies": {
-        "@typescript-eslint/parser": "^5.0.0",
-        "eslint": "^6.0.0 || ^7.0.0 || ^8.0.0"
-      },
-      "peerDependenciesMeta": {
-        "typescript": {
-          "optional": true
+      setPreviewUrl(res.previewUrl);
+    } catch (e) {
+      alert('Не удалось сгенерировать предпросмотр заново');
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleLike = async () => {
+    setIsBusy(true);
+    try {
+      // 1) Создаем проект
+      const created = await api.createProject({ 
+        name: state.projectName, 
+        is_public: state.is_public,
+        text_input: state.textInput || undefined
+      });
+      const projectId = created.project.id ?? created.projectId ?? created.id;
+
+      // 2) Загружаем изображения в проект (только если есть изображения)
+      let imagePath = null;
+      if (state.images && state.images.length > 0) {
+        const uploadResult = await api.uploadProjectImages(projectId, state.images);
+        // Берем путь к первому загруженному изображению
+        if (uploadResult.files && uploadResult.files.length > 0) {
+          imagePath = uploadResult.files[0].path;
         }
       }
-    },
-    "node_modules/@typescript-eslint/experimental-utils": {
-      "version": "5.62.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/experimental-utils/-/experimental-utils-5.62.0.tgz",
-      "integrity": "sha512-RTXpeB3eMkpoclG3ZHft6vG/Z30azNHuqY6wKPBHlVMZFuEvrtlEDe8gMqDb+SO+9hjC/pLekeSCryf9vMZlCw==",
-      "license": "MIT",
-      "dependencies": {
-        "@typescript-eslint/utils": "5.62.0"
-      },
-      "engines": {
-        "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/typescript-eslint"
-      },
-      "peerDependencies": {
-        "eslint": "^6.0.0 || ^7.0.0 || ^8.0.0"
-      }
-    },
-    "node_modules/@typescript-eslint/parser": {
-      "version": "5.62.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-5.62.0.tgz",
-      "integrity": "sha512-VlJEV0fOQ7BExOsHYAGrgbEiZoi8D+Bl2+f6V2RrXerRSylnp+ZBHmPvaIa8cz0Ajx7WO7Z5RqfgYg7ED1nRhA==",
-      "license": "BSD-2-Clause",
-      "dependencies": {
-        "@typescript-eslint/scope-manager": "5.62.0",
-        "@typescript-eslint/types": "5.62.0",
-        "@typescript-eslint/typescript-estree": "5.62.0",
-        "debug": "^4.3.4"
-      },
-      "engines": {
-        "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/typescript-eslint"
-      },
-      "peerDependencies": {
-        "eslint": "^6.0.0 || ^7.0.0 || ^8.0.0"
-      },
-      "peerDependenciesMeta": {
-        "typescript": {
-          "optional": true
-        }
-      }
-    },
-    "node_modules/@typescript-eslint/scope-manager": {
-      "version": "5.62.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/scope-manager/-/scope-manager-5.62.0.tgz",
-      "integrity": "sha512-VXuvVvZeQCQb5Zgf4HAxc04q5j+WrNAtNh9OwCsCgpKqESMTu3tF/jhZ3xG6T4NZwWl65Bg8KuS2uEvhSfLl0w==",
-      "license": "MIT",
-      "dependencies": {
-        "@typescript-eslint/types": "5.62.0",
-        "@typescript-eslint/visitor-keys": "5.62.0"
-      },
-      "engines": {
-        "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/typescript-eslint"
-      }
-    },
-    "node_modules/@typescript-eslint/type-utils": {
-      "version": "5.62.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/type-utils/-/type-utils-5.62.0.tgz",
-      "integrity": "sha512-xsSQreu+VnfbqQpW5vnCJdq1Z3Q0U31qiWmRhr98ONQmcp/yhiPJFPq8MXiJVLiksmOKSjIldZzkebzHuCGzew==",
-      "license": "MIT",
-      "dependencies": {
-        "@typescript-eslint/typescript-estree": "5.62.0",
-        "@typescript-eslint/utils": "5.62.0",
-        "debug": "^4.3.4",
-        "tsutils": "^3.21.0"
-      },
-      "engines": {
-        "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/typescript-eslint"
-      },
-      "peerDependencies": {
-        "eslint": "*"
-      },
-      "peerDependenciesMeta": {
-        "typescript": {
-          "optional": true
-        }
-      }
-    },
-    "node_modules/@typescript-eslint/types": {
-      "version": "5.62.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/types/-/types-5.62.0.tgz",
-      "integrity": "sha512-87NVngcbVXUahrRTqIK27gD2t5Cu1yuCXx
+
+      // 3) Запускаем генерацию 3D модели через SHAP-E
+      await api.generateModel(projectId, {
+        imagePath: imagePath || undefined,
+        prompt: state.textInput || undefined,
+        generationType: state.creationMode === 'text' ? 'text' : state.creationMode === 'images' ? 'image' : 'both'
+      });
+
+      // 4) Переходим на страницу результата с ID проекта
+      navigate('/project/result', { state: { projectId } });
+    } catch (e) {
+      console.error('Ошибка создания проекта:', e);
+      const errorMessage = e instanceof Error ? e.message : 'Неизвестная ошибка';
+      alert(`Не удалось создать проект: ${errorMessage}`);
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleBack = () => navigate('/project/new');
+
+  return (
+    <div className="page">
+      <header className="header">
+        <div className="header-content">
+          <div className="header-logo"></div>
+          <div className="header-actions">
+            <button className="logout-btn" onClick={handleBack}>Назад</button>
+          </div>
+        </div>
+      </header>
+
+      <div className="page-content">
+        <div className="container" style={{ maxWidth: 900 }}>
+          <h2 style={{ marginBottom: 16 }}>
+            {state.creationMode === 'text' 
+              ? 'Вам нравится сгенерированная 3D-модель по вашему описанию?' 
+              : 'Вам нравится сгенерированная 3D-модель?'
+            }
+          </h2>
+          <div className="card" style={{ padding: 16 }}>
+            {previewUrl ? (
+              <img src={previewUrl} alt="preview" style={{ width: '100%', borderRadius: 8 }} />
+            ) : (
+              <div style={{ textAlign: 'center', color: '#666' }}>Нет предпросмотра</div>
+            )}
+            <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+              <button className="btn btn-outline" onClick={handleDislike} disabled={isBusy}>
+                Не нравится — сгенерировать снова
+              </button>
+              <button className="btn btn-secondary" onClick={handleLike} disabled={isBusy}>
+                Нравится — создать проект
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PreviewPage;
+
+

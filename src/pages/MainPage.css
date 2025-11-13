@@ -1,156 +1,333 @@
-n-transform-react-native-svg": {
-      "version": "5.4.0",
-      "resolved": "https://registry.npmjs.org/@svgr/babel-plugin-transform-react-native-svg/-/babel-plugin-transform-react-native-svg-5.4.0.tgz",
-      "integrity": "sha512-3eYP/SaopZ41GHwXma7Rmxcv9uRslRDTY1estspeB1w1ueZWd/tPlMfEOoccYpEMZU3jD4OU7YitnXcF5hLW2Q==",
-      "license": "MIT",
-      "engines": {
-        "node": ">=10"
-      },
-      "funding": {
-        "type": "github",
-        "url": "https://github.com/sponsors/gregberge"
-      }
-    },
-    "node_modules/@svgr/babel-plugin-transform-svg-component": {
-      "version": "5.5.0",
-      "resolved": "https://registry.npmjs.org/@svgr/babel-plugin-transform-svg-component/-/babel-plugin-transform-svg-component-5.5.0.tgz",
-      "integrity": "sha512-q4jSH1UUvbrsOtlo/tKcgSeiCHRSBdXoIoqX1pgcKK/aU3JD27wmMKwGtpB8qRYUYoyXvfGxUVKchLuR5pB3rQ==",
-      "license": "MIT",
-      "engines": {
-        "node": ">=10"
-      },
-      "funding": {
-        "type": "github",
-        "url": "https://github.com/sponsors/gregberge"
-      }
-    },
-    "node_modules/@svgr/babel-preset": {
-      "version": "5.5.0",
-      "resolved": "https://registry.npmjs.org/@svgr/babel-preset/-/babel-preset-5.5.0.tgz",
-      "integrity": "sha512-4FiXBjvQ+z2j7yASeGPEi8VD/5rrGQk4Xrq3EdJmoZgz/tpqChpo5hgXDvmEauwtvOc52q8ghhZK4Oy7qph4ig==",
-      "license": "MIT",
-      "dependencies": {
-        "@svgr/babel-plugin-add-jsx-attribute": "^5.4.0",
-        "@svgr/babel-plugin-remove-jsx-attribute": "^5.4.0",
-        "@svgr/babel-plugin-remove-jsx-empty-expression": "^5.0.1",
-        "@svgr/babel-plugin-replace-jsx-attribute-value": "^5.0.1",
-        "@svgr/babel-plugin-svg-dynamic-title": "^5.4.0",
-        "@svgr/babel-plugin-svg-em-dimensions": "^5.4.0",
-        "@svgr/babel-plugin-transform-react-native-svg": "^5.4.0",
-        "@svgr/babel-plugin-transform-svg-component": "^5.5.0"
-      },
-      "engines": {
-        "node": ">=10"
-      },
-      "funding": {
-        "type": "github",
-        "url": "https://github.com/sponsors/gregberge"
-      }
-    },
-    "node_modules/@svgr/core": {
-      "version": "5.5.0",
-      "resolved": "https://registry.npmjs.org/@svgr/core/-/core-5.5.0.tgz",
-      "integrity": "sha512-q52VOcsJPvV3jO1wkPtzTuKlvX7Y3xIcWRpCMtBF3MrteZJtBfQw/+u0B1BHy5ColpQc1/YVTrPEtSYIMNZlrQ==",
-      "license": "MIT",
-      "dependencies": {
-        "@svgr/plugin-jsx": "^5.5.0",
-        "camelcase": "^6.2.0",
-        "cosmiconfig": "^7.0.0"
-      },
-      "engines": {
-        "node": ">=10"
-      },
-      "funding": {
-        "type": "github",
-        "url": "https://github.com/sponsors/gregberge"
-      }
-    },
-    "node_modules/@svgr/hast-util-to-babel-ast": {
-      "version": "5.5.0",
-      "resolved": "https://registry.npmjs.org/@svgr/hast-util-to-babel-ast/-/hast-util-to-babel-ast-5.5.0.tgz",
-      "integrity": "sha512-cAaR/CAiZRB8GP32N+1jocovUtvlj0+e65TB50/6Lcime+EA49m/8l+P2ko+XPJ4dw3xaPS3jOL4F2X4KWxoeQ==",
-      "license": "MIT",
-      "dependencies": {
-        "@babel/types": "^7.12.6"
-      },
-      "engines": {
-        "node": ">=10"
-      },
-      "funding": {
-        "type": "github",
-        "url": "https://github.com/sponsors/gregberge"
-      }
-    },
-    "node_modules/@svgr/plugin-jsx": {
-      "version": "5.5.0",
-      "resolved": "https://registry.npmjs.org/@svgr/plugin-jsx/-/plugin-jsx-5.5.0.tgz",
-      "integrity": "sha512-V/wVh33j12hGh05IDg8GpIUXbjAPnTdPTKuP4VNLggnwaHMPNQNae2pRnyTAILWCQdz5GyMqtO488g7CKM8CBA==",
-      "license": "MIT",
-      "dependencies": {
-        "@babel/core": "^7.12.3",
-        "@svgr/babel-preset": "^5.5.0",
-        "@svgr/hast-util-to-babel-ast": "^5.5.0",
-        "svg-parser": "^2.0.2"
-      },
-      "engines": {
-        "node": ">=10"
-      },
-      "funding": {
-        "type": "github",
-        "url": "https://github.com/sponsors/gregberge"
-      }
-    },
-    "node_modules/@svgr/plugin-svgo": {
-      "version": "5.5.0",
-      "resolved": "https://registry.npmjs.org/@svgr/plugin-svgo/-/plugin-svgo-5.5.0.tgz",
-      "integrity": "sha512-r5swKk46GuQl4RrVejVwpeeJaydoxkdwkM1mBKOgJLBUJPGaLci6ylg/IjhrRsREKDkr4kbMWdgOtbXEh0fyLQ==",
-      "license": "MIT",
-      "dependencies": {
-        "cosmiconfig": "^7.0.0",
-        "deepmerge": "^4.2.2",
-        "svgo": "^1.2.2"
-      },
-      "engines": {
-        "node": ">=10"
-      },
-      "funding": {
-        "type": "github",
-        "url": "https://github.com/sponsors/gregberge"
-      }
-    },
-    "node_modules/@svgr/webpack": {
-      "version": "5.5.0",
-      "resolved": "https://registry.npmjs.org/@svgr/webpack/-/webpack-5.5.0.tgz",
-      "integrity": "sha512-DOBOK255wfQxguUta2INKkzPj6AIS6iafZYiYmHn6W3pHlycSRRlvWKCfLDG10fXfLWqE3DJHgRUOyJYmARa7g==",
-      "license": "MIT",
-      "dependencies": {
-        "@babel/core": "^7.12.3",
-        "@babel/plugin-transform-react-constant-elements": "^7.12.1",
-        "@babel/preset-env": "^7.12.1",
-        "@babel/preset-react": "^7.12.5",
-        "@svgr/core": "^5.5.0",
-        "@svgr/plugin-jsx": "^5.5.0",
-        "@svgr/plugin-svgo": "^5.5.0",
-        "loader-utils": "^2.0.0"
-      },
-      "engines": {
-        "node": ">=10"
-      },
-      "funding": {
-        "type": "github",
-        "url": "https://github.com/sponsors/gregberge"
-      }
-    },
-    "node_modules/@tootallnate/once": {
-      "version": "1.1.2",
-      "resolved": "https://registry.npmjs.org/@tootallnate/once/-/once-1.1.2.tgz",
-      "integrity": "sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==",
-      "license": "MIT",
-      "engines": {
-        "node": ">= 6"
-      }
-    },
-    "node_modules/@trysound/sax": {
-      "version": "0.2.0",
-      "resolved": "https://registry.npmjs.org/@trysound/sax/-/sax-0.2.0.tgz",
-      "integrity": "sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaa
+.main-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* Projects Section Styles */
+
+/* Search and Filter Section */
+.search-filter-section {
+  padding: 30px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.search-filter-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.sort-dropdown {
+  flex-shrink: 0;
+}
+
+.sort-btn {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  justify-content: space-between;
+}
+
+.sort-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.search-bar {
+  flex: 1;
+  position: relative;
+  max-width: 500px;
+}
+
+.search-bar svg {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  background: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px 14px 50px;
+  font-size: 16px;
+  color: #495057;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.search-input::placeholder {
+  color: #adb5bd;
+}
+
+/* Projects Section */
+.projects-section {
+  padding: 0 20px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.projects-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.welcome-section {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-top: 20px;
+}
+
+.welcome-content h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 16px 0;
+}
+
+.welcome-content p {
+  font-size: 16px;
+  color: #6c757d;
+  margin: 0 0 32px 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.loading-state,
+.error-state,
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-top: 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.project-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.project-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  border-color: rgba(0, 123, 255, 0.2);
+}
+
+.project-thumbnail {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-info {
+  padding: 20px;
+}
+
+.project-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.project-author {
+  font-size: 13px;
+  color: #495057;
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.author-label {
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.author-name {
+  color: #007bff;
+  font-weight: 500;
+}
+
+.project-date {
+  font-size: 12px;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* Button Styles */
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .search-filter-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .sort-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .search-bar {
+    width: 100%;
+    max-width: none;
+  }
+  
+  .projects-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .projects-title {
+    font-size: 24px;
+  }
+  
+  .projects-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .welcome-content h2 {
+    font-size: 24px;
+  }
+  
+  .welcome-content p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-filter-section {
+    padding: 20px 16px;
+  }
+  
+  .projects-section {
+    padding: 0 16px 30px;
+  }
+  
+  .projects-title {
+    font-size: 20px;
+  }
+  
+  .welcome-section {
+    padding: 40px 16px;
+  }
+  
+  .welcome-content h2 {
+    font-size: 20px;
+  }
+}

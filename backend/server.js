@@ -17,7 +17,12 @@ dirs.forEach(dir => {
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -27,10 +32,12 @@ app.use('/models', express.static(path.join(__dirname, 'models')));
 app.use('/previews', express.static(path.join(__dirname, 'previews')));
 
 // Routes
+const authRouter = require('./routes/auth');
 const projectsRouter = require('./routes/projects');
 const uploadRouter = require('./routes/upload');
 const generateRouter = require('./routes/generate');
 
+app.use('/api/auth', authRouter);
 app.use('/api/projects', projectsRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/generate', generateRouter);

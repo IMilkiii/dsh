@@ -1,25 +1,39 @@
-pendencies": {
-        "@babel/core": "^7.0.0"
+import { SUPPORTED_IMAGE_TYPES } from '../constants';
+
+export const validateImageFile = (file: File): boolean => {
+  return SUPPORTED_IMAGE_TYPES.includes(file.type);
+};
+
+export const validateImageSize = (file: File, maxSizeMB: number = 10): boolean => {
+  const maxSizeBytes = maxSizeMB * 1024 * 1024;
+  return file.size <= maxSizeBytes;
+};
+
+export const createImagePreview = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        resolve(e.target.result as string);
+      } else {
+        reject(new Error('Failed to read file'));
       }
-    },
-    "node_modules/babel-preset-react-app": {
-      "version": "10.1.0",
-      "resolved": "https://registry.npmjs.org/babel-preset-react-app/-/babel-preset-react-app-10.1.0.tgz",
-      "integrity": "sha512-f9B1xMdnkCIqe+2dHrJsoQFRz7reChaAHE/65SdaykPklQqhme2WaC08oD3is77x9ff98/9EazAKFDZv5rFEQg==",
-      "license": "MIT",
-      "dependencies": {
-        "@babel/core": "^7.16.0",
-        "@babel/plugin-proposal-class-properties": "^7.16.0",
-        "@babel/plugin-proposal-decorators": "^7.16.4",
-        "@babel/plugin-proposal-nullish-coalescing-operator": "^7.16.0",
-        "@babel/plugin-proposal-numeric-separator": "^7.16.0",
-        "@babel/plugin-proposal-optional-chaining": "^7.16.0",
-        "@babel/plugin-proposal-private-methods": "^7.16.0",
-        "@babel/plugin-proposal-private-property-in-object": "^7.16.7",
-        "@babel/plugin-transform-flow-strip-types": "^7.16.0",
-        "@babel/plugin-transform-react-display-name": "^7.16.0",
-        "@babel/plugin-transform-runtime": "^7.16.4",
-        "@babel/preset-env": "^7.16.4",
-        "@babel/preset-react": "^7.16.0",
-        "@babel/preset-typescript": "^7.16.0",
-        "@babel/runtime"
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+};
+
+export const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+export const generateUniqueId = (): string => {
+  return Math.random().toString(36).substr(2, 9);
+};

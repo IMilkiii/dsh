@@ -10,10 +10,34 @@ const pool = new Pool({
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM projects ORDER BY created_at DESC');
-    res.json(result.rows);
+    res.json({ projects: result.rows });
   } catch (error) {
     console.error('Error fetching projects:', error);
     res.status(500).json({ error: 'Failed to fetch projects' });
+  }
+});
+
+// Get public projects
+router.get('/public', async (req, res) => {
+  try {
+    const { q, sort = 'created_at', order = 'desc' } = req.query;
+    let query = 'SELECT * FROM projects WHERE is_public = true';
+    const params = [];
+    
+    if (q) {
+      query += ' AND (name ILIKE $1 OR description ILIKE $1)';
+      params.push(`%${q}%`);
+    }
+    
+    const validSort = ['created_at', 'updated_at', 'name'].includes(sort) ? sort : 'created_at';
+    const validOrder = order.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
+    query += ` ORDER BY ${validSort} ${validOrder}`;
+    
+    const result = await pool.query(query, params);
+    res.json({ projects: result.rows });
+  } catch (error) {
+    console.error('Error fetching public projects:', error);
+    res.status(500).json({ error: 'Failed to fetch public projects' });
   }
 });
 
@@ -27,7 +51,7 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Project not found' });
     }
     
-    res.json(result.rows[0]);
+    res.json({ project: result.rows[0] });
   } catch (error) {
     console.error('Error fetching project:', error);
     res.status(500).json({ error: 'Failed to fetch project' });
@@ -37,12 +61,12 @@ router.get('/:id', async (req, res) => {
 // Create new project
 router.post('/', async (req, res) => {
   try {
-    const { name, description, prompt, generationType } = req.body;
+    const { name, description, prompt, generationType, text_input, is_public } = req.body;
     const result = await pool.query(
-      'INSERT INTO projects (name, description, prompt, generation_type) VALUES ($1, $2, $3, $4) RETURNING *',
-      [name, description, prompt || null, generationType || 'image']
+      'INSERT INTO projects (name, description, prompt, generation_type, is_public) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [name, description, prompt || text_input || null, generationType || 'image', is_public !== false]
     );
-    res.status(201).json(result.rows[0]);
+    res.status(201).json({ project: result.rows[0] });
   } catch (error) {
     console.error('Error creating project:', error);
     res.status(500).json({ error: 'Failed to create project' });

@@ -40,10 +40,14 @@ router.post('/', async (req, res) => {
       generationType: genType
     });
     
+    // Преобразуем пути для сохранения в БД
+    const modelPath = response.modelPath ? response.modelPath.replace('/app/models', '/models') : null;
+    const previewPath = response.previewPath ? response.previewPath.replace('/app/previews', '/previews') : null;
+    
     // Update project with result
     await pool.query(
       'UPDATE projects SET status = $1, model_path = $2, preview_path = $3, updated_at = NOW() WHERE id = $4',
-      ['completed', response.modelPath, response.previewPath || null, projectId]
+      ['completed', modelPath, previewPath, projectId]
     );
     
     res.json({
