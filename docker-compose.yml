@@ -58,6 +58,7 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./shap-e-service/app:/app
+      - ./shap-e-service/cache:/root/.cache/shap-e
       - shape_models:/app/models
       - shape_previews:/app/previews
       - backend_uploads:/app/uploads:ro
