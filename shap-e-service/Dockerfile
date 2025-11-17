@@ -1,4 +1,4 @@
-﻿FROM python:3.10-slim
+﻿FROM python:3.11-slim
 
 WORKDIR /app
 
@@ -9,8 +9,9 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PyTorch (CPU) first to ensure compatibility
-RUN pip install --no-cache-dir \
+# Upgrade pip and install PyTorch (CPU) first to ensure compatibility
+RUN python -m pip install --no-cache-dir --upgrade pip && \
+    python -m pip install --no-cache-dir \
     torch==2.0.1+cpu \
     torchvision==0.15.2+cpu \
     torchaudio==2.0.2+cpu \
@@ -18,7 +19,7 @@ RUN pip install --no-cache-dir \
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY app/ ./
